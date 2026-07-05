@@ -1,5 +1,7 @@
 # mem0-mcp
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 A small MCP server that wraps a self-hosted [mem0](https://mem0.ai) REST API
 (see `../server-compose-files/ai-containers`) as tools for Claude Desktop /
 Claude Code. Mem0's own official MCP integrations (`mcp.mem0.ai`, the archived
