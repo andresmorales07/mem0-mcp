@@ -1,3 +1,10 @@
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "httpx>=0.28.1",
+#     "mcp[cli]>=1.28.1",
+# ]
+# ///
 import os
 from typing import Any, Optional
 
