@@ -1,10 +1,3 @@
-# /// script
-# requires-python = ">=3.12"
-# dependencies = [
-#     "httpx>=0.28.1",
-#     "mcp[cli]>=1.28.1",
-# ]
-# ///
 import os
 from typing import Any, Optional
 
@@ -156,5 +149,9 @@ def delete_memory(memory_id: str) -> str:
     return "Memory deleted successfully"
 
 
-if __name__ == "__main__":
+def main() -> None:
     mcp.run()
+
+
+if __name__ == "__main__":
+    main()
