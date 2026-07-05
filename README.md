@@ -32,7 +32,34 @@ API Keys page after) and the URL your machine can reach the mem0 API at.
 
 Add to Claude Desktop's config
 (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS).
-Two ways to point it at `main.py`, depending on whether you've cloned the repo:
+Two ways to run it, depending on whether you've cloned the repo:
+
+**Without cloning**, straight from GitHub — same `uvx --from git+...` pattern
+other MCP servers use to run from a repo without publishing to PyPI first:
+
+```bash
+uvx --from git+https://github.com/andresmorales07/mem0-mcp mem0-mcp
+```
+
+```json
+{
+  "mcpServers": {
+    "mem0": {
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/andresmorales07/mem0-mcp", "mem0-mcp"],
+      "env": {
+        "MEM0_API_URL": "http://your-mem0-host:8888",
+        "MEM0_API_KEY": "m0sk_...",
+        "MEM0_DEFAULT_USER_ID": "your-user-id",
+        "MEM0_DEFAULT_AGENT_ID": "claude-desktop"
+      }
+    }
+  }
+}
+```
+
+Prefer to pin to a released version instead of tracking `main`? Append a ref,
+e.g. `git+https://github.com/andresmorales07/mem0-mcp@v0.1.0`.
 
 **From a local clone:**
 
@@ -41,7 +68,7 @@ Two ways to point it at `main.py`, depending on whether you've cloned the repo:
   "mcpServers": {
     "mem0": {
       "command": "uv",
-      "args": ["run", "--directory", "/path/to/mem0-mcp", "main.py"],
+      "args": ["run", "--directory", "/path/to/mem0-mcp", "mem0-mcp"],
       "env": {
         "MEM0_API_URL": "http://your-mem0-host:8888",
         "MEM0_API_KEY": "m0sk_...",
@@ -53,36 +80,8 @@ Two ways to point it at `main.py`, depending on whether you've cloned the repo:
 }
 ```
 
-**Without cloning:** `main.py` carries inline [PEP 723](https://peps.python.org/pep-0723/)
-script metadata, so `uv` can run it straight from the GitHub URL instead — no
-clone, no `pyproject.toml` needed on the target machine:
-
-```bash
-uv run https://raw.githubusercontent.com/andresmorales07/mem0-mcp/main/main.py
-```
-
-```json
-{
-  "mcpServers": {
-    "mem0": {
-      "command": "uv",
-      "args": ["run", "https://raw.githubusercontent.com/andresmorales07/mem0-mcp/main/main.py"],
-      "env": {
-        "MEM0_API_URL": "http://your-mem0-host:8888",
-        "MEM0_API_KEY": "m0sk_...",
-        "MEM0_DEFAULT_USER_ID": "your-user-id",
-        "MEM0_DEFAULT_AGENT_ID": "claude-desktop"
-      }
-    }
-  }
-}
-```
-
-Prefer to pin to a released version instead of tracking `main`? Point the URL
-at a tag instead, e.g. `.../andresmorales07/mem0-mcp/v0.1.0/main.py`.
-
-Use the full path to `uv` (e.g. `which uv`) if Claude Desktop can't find it on
-its own `PATH`.
+Use the full path to `uv`/`uvx` (e.g. `which uv`) if Claude Desktop can't find
+them on its own `PATH`.
 
 Both default env vars are optional, and they behave differently:
 
@@ -111,7 +110,7 @@ permission the first time it calls one of these tools.
 
 ```bash
 MEM0_API_URL=http://your-mem0-host:8888 MEM0_API_KEY=m0sk_... uv run python -c "
-import main
-print(main.list_memories(user_id='alice'))
+from mem0_mcp.server import list_memories
+print(list_memories(user_id='alice'))
 "
 ```

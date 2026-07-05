@@ -4,21 +4,27 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A single-file MCP server (`main.py`) that wraps a **self-hosted** mem0 REST API as tools for
-Claude Desktop / Claude Code. Mem0's official MCP integrations only target Mem0's cloud API
-(different auth header, different routes), so this exists to talk to a self-hosted instance
-instead (see the sibling `../server-compose-files/ai-containers` repo for that deployment).
+A single-tool-module MCP server (`src/mem0_mcp/server.py`) that wraps a **self-hosted** mem0
+REST API as tools for Claude Desktop / Claude Code. Mem0's official MCP integrations only target
+Mem0's cloud API (different auth header, different routes), so this exists to talk to a
+self-hosted instance instead (see the sibling `../server-compose-files/ai-containers` repo for
+that deployment).
+
+Packaged as an installable console script (`mem0-mcp`, via `[project.scripts]` in
+`pyproject.toml`) rather than a loose script, so it can be run the way most MCP servers are —
+`uvx --from git+<repo-url> mem0-mcp` without cloning, or `uv run --directory <path> mem0-mcp`
+from a local clone.
 
 ## Commands
 
 ```bash
 uv sync                      # install dependencies into .venv
-uv run main.py                # run the MCP server directly (stdio transport)
+uv run mem0-mcp               # run the MCP server directly (stdio transport)
 
 # Manual smoke test against a running mem0 instance:
 MEM0_API_URL=http://dockerhost.home:8888 MEM0_API_KEY=m0sk_... uv run python -c "
-import main
-print(main.list_memories(user_id='alice'))
+from mem0_mcp.server import list_memories
+print(list_memories(user_id='alice'))
 "
 ```
 
@@ -33,8 +39,8 @@ Optional env vars: `MEM0_DEFAULT_USER_ID`, `MEM0_DEFAULT_AGENT_ID` (see scoping 
 
 ## Architecture
 
-Everything lives in `main.py`: an `httpx.Client` configured with the mem0 API's `X-API-Key`
-auth, wrapped by `FastMCP` tool functions that each map 1:1 to a mem0 REST endpoint
+Everything lives in `src/mem0_mcp/server.py`: an `httpx.Client` configured with the mem0 API's
+`X-API-Key` auth, wrapped by `FastMCP` tool functions that each map 1:1 to a mem0 REST endpoint
 (`add_memory` → `POST /memories`, `search_memories` → `POST /search`, etc.). Bulk-delete
 endpoints (`delete_all_memories`, `/reset`) are intentionally **not** exposed as tools, to keep
 the blast radius of an LLM-driven tool call small — use `curl` directly against the API for
