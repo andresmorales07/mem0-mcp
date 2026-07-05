@@ -30,16 +30,36 @@ directly against the API for those.
 Requires an API key from the mem0 dashboard (`/setup` on first run, or the
 API Keys page after) and the URL your machine can reach the mem0 API at.
 
-`main.py` carries inline [PEP 723](https://peps.python.org/pep-0723/) script
-metadata, so `uv` can run it straight from the GitHub URL — no clone, no
-`pyproject.toml` needed on the target machine:
+Add to Claude Desktop's config
+(`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS).
+Two ways to point it at `main.py`, depending on whether you've cloned the repo:
+
+**From a local clone:**
+
+```json
+{
+  "mcpServers": {
+    "mem0": {
+      "command": "uv",
+      "args": ["run", "--directory", "/path/to/mem0-mcp", "main.py"],
+      "env": {
+        "MEM0_API_URL": "http://your-mem0-host:8888",
+        "MEM0_API_KEY": "m0sk_...",
+        "MEM0_DEFAULT_USER_ID": "your-user-id",
+        "MEM0_DEFAULT_AGENT_ID": "claude-desktop"
+      }
+    }
+  }
+}
+```
+
+**Without cloning:** `main.py` carries inline [PEP 723](https://peps.python.org/pep-0723/)
+script metadata, so `uv` can run it straight from the GitHub URL instead — no
+clone, no `pyproject.toml` needed on the target machine:
 
 ```bash
 uv run https://raw.githubusercontent.com/andresmorales07/mem0-mcp/main/main.py
 ```
-
-Add to Claude Desktop's config
-(`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
 
 ```json
 {
@@ -58,13 +78,11 @@ Add to Claude Desktop's config
 }
 ```
 
+Prefer to pin to a released version instead of tracking `main`? Point the URL
+at a tag instead, e.g. `.../andresmorales07/mem0-mcp/v0.1.0/main.py`.
+
 Use the full path to `uv` (e.g. `which uv`) if Claude Desktop can't find it on
 its own `PATH`.
-
-Prefer to pin to a released version instead of tracking `main`? Point the URL
-at a tag instead, e.g.
-`.../andresmorales07/mem0-mcp/v0.1.0/main.py`. To run from a local clone
-instead, swap the URL argument for `["run", "--directory", "/path/to/mem0-mcp", "main.py"]`.
 
 Both default env vars are optional, and they behave differently:
 
